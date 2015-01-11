@@ -159,6 +159,7 @@ $string['filesareasite'] = 'the site files area';
 $string['filestomove'] = 'Move / copy files to {$a}?';
 $string['firsttry'] = 'First try';
 $string['flagged'] = 'Flagged';
+$string['severalcategory'] = 'severalcategory';
 $string['flagthisquestion'] = 'Flag this question';
 $string['formquestionnotinids'] = 'Form contained question that is not in questionids';
 $string['fractionsnomax'] = 'One of the answers should have a score of 100% so it is possible to get full marks for this question.';

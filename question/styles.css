@@ -1,0 +1,9 @@
+#page-question-export ul, li {
+    list-style-type: none;
+}
+
+#page-question-export .fstatic {
+    overflow-y: scroll;
+    max-height: 40em;
+    max-width: 50em;
+}

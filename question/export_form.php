@@ -28,6 +28,7 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->libdir . '/formslib.php');
 
+require_once($CFG->libdir . '/questionlib.php');
 
 /**
  * Form to export questions from the question bank.
@@ -45,8 +46,8 @@ class question_export_form extends moodleform {
 
         // Choice of format, with help.
         $mform->addElement('header', 'fileformat', get_string('fileformat', 'question'));
-        $fileformatnames = get_import_export_formats('export');
         $radioarray = array();
+        $fileformatnames = get_import_export_formats('export');
         $i = 0 ;
         foreach ($fileformatnames as $shortname => $fileformatname) {
             $currentgrp1 = array();
@@ -63,10 +64,9 @@ class question_export_form extends moodleform {
 
         // Export options.
         $mform->addElement('header', 'general', get_string('general', 'form'));
-
-        $mform->addElement('questioncategory', 'category', get_string('exportcategory', 'question'), compact('contexts'));
-        $mform->setDefault('category', $defaultcategory);
-        $mform->addHelpButton('category', 'exportcategory', 'question');
+        $mform->addElement('static', 'catlist', '',
+            $this->get_all_block_categories(question_category_options($contexts), $defaultcategory));
+        $mform->addHelpButton('catlist', 'exportcategory', 'question');
 
         $categorygroup = array();
         $categorygroup[] = $mform->createElement('checkbox', 'cattofile', '', get_string('tofilecategory', 'question'));
@@ -83,5 +83,109 @@ class question_export_form extends moodleform {
 
         // Submit buttons.
         $this->add_action_buttons(false, get_string('exportquestions', 'question'));
+    }
+
+    /**
+     * create html block string for array categories
+     * @param array $contexts, categories
+     * @param string $defaultcategory, defaul category
+     * @return string,  format block html of list categories
+     */
+    public function get_all_block_categories($contexts, $defaultcategory) {
+        $blockoutput = '';
+
+        foreach ($contexts as $key => $categories) {
+            $blockoutput .= html_writer::start_tag('li');
+            $blockoutput .= html_writer::tag('strong', $key);
+            $blockoutput .= html_writer::start_tag('ul');
+            $blockoutput .= $this->block_categories($categories, $defaultcategory);
+            $blockoutput .= html_writer::end_tag('ul');
+            $blockoutput .= html_writer::end_tag('li');
+        }
+
+        global $OUTPUT;
+        $result = '';
+        $result .= $OUTPUT->box_start('boxwidthwide boxaligncenter generalbox questioncategories contextlevel');
+        $result .= $blockoutput;
+        $result .= $OUTPUT->box_end();
+
+        return $result;
+    }
+
+    /**
+     * create html string for array categories
+     * @param array $categories, categories
+     * @param string $defaultcategory, defaul category
+     * @return string, format html of list categories
+     */
+    public function block_categories($categories, $defaultcategory) {
+        $output = '';
+        $ischecking = false;
+        $levelchecking = -1;
+        $levellastparent = -1;
+        $previouscategory = null;
+
+        foreach ($categories as $key => $value) {
+
+            if ($ischecking && substr_count($value, '&nbsp;') <= $levelchecking) {
+                $ischecking = false;
+            }
+
+            if ($key == $defaultcategory) {
+                $levelchecking = substr_count($value, '&nbsp;');
+                $ischecking = true;
+            }
+
+            if (substr_count($value, '&nbsp;') > substr_count($previouscategory, '&nbsp;')) {
+                $output .= html_writer::start_tag('ul');
+                $levellastparent = substr_count($previouscategory, '&nbsp;');
+            } else if (substr_count($value, '&nbsp;') < substr_count( $previouscategory, '&nbsp;')) {
+                $numparent = (substr_count( $previouscategory, '&nbsp;') - substr_count($value, '&nbsp;')) / 3;
+
+                for ($i = 0; $i < $numparent; $i++) {
+                    $output .= html_writer::end_tag('ul');
+                    $output .= html_writer::end_tag('li');
+                }
+
+                $levellastparent = substr_count($value, '&nbsp;');
+            }
+
+            $output .= $this->item_html($value, $ischecking);
+            $previouscategory = $value;
+        }
+
+        $output .= html_writer::end_tag('li');
+        for ($i = 0; $i <= $levellastparent / 3; $i++) {
+            $output .= html_writer::end_tag('ul');
+            $output .= html_writer::end_tag('li');
+        }
+
+        return $output;
+    }
+
+    /**
+     * create html string for item category
+     * @param string $content, category
+     * @param boolean $ischecked, checkbox is checked or not
+     * @return string, format html of item category
+     */
+    public function item_html($content, $ischecked) {
+        $output = '';
+
+        $output .= html_writer::start_tag('li');
+        $output .= html_writer::start_tag('label');
+
+        if ($ischecked) {
+            $output .= html_writer::checkbox('cat', 1, 'true', '',
+                array('onclick' => 'checkChildren(this);'));
+        } else {
+            $output .= html_writer::checkbox('cat', 1, '', '',
+                array('onclick' => 'checkChildren(this);'));
+        }
+
+        $output .= str_replace('&nbsp;', '', $content);
+        $output .= html_writer::end_tag('label');
+
+        return $output;
     }
 }

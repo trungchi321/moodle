@@ -36,7 +36,7 @@ defined('MOODLE_INTERNAL') || die();
 class qformat_default {
 
     public $displayerrors = true;
-    public $category = null;
+    public $category = array();
     public $questions = array();
     public $course = null;
     public $filename = '';
@@ -104,7 +104,7 @@ class qformat_default {
         if (count($this->questions)) {
             debugging('You shouldn\'t call setCategory after setQuestions');
         }
-        $this->category = $category;
+        $this->category[] = $category;
         $this->importcontext = context::instance_by_id($this->category->contextid);
     }
 
