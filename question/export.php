@@ -46,10 +46,11 @@ $PAGE->requires->css('/question/styles.css');
 $PAGE->requires->js('/question/checkChildrenScript.js');
 echo $OUTPUT->header();
 
-$exportform = new question_export_form($thispageurl,
+$export_form = new question_export_form($thispageurl,
         array('contexts' => $contexts->having_one_edit_tab_cap('export'), 'defaultcategory' => $pagevars['cat']));
 
-if ($fromform = $exportform->get_data()) {
+
+if ($from_form = $export_form->get_data()) {
 
     // Get id of categories.
     $rawdata = (array)data_submitted();
@@ -63,19 +64,19 @@ if ($fromform = $exportform->get_data()) {
     }
 
     $thiscontext = $contexts->lowest();
-    if (!is_readable("format/{$fromform->format}/format.php")) {
-        print_error('unknowformat', '', '', $fromform->format);
+    if (!is_readable("format/{$from_form->format}/format.php")) {
+        print_error('unknowformat', '', '', $from_form->format);
     }
     $withcategories = 'nocategories';
-    if (!empty($fromform->cattofile)) {
+    if (!empty($from_form->cattofile)) {
         $withcategories = 'withcategories';
     }
     $withcontexts = 'nocontexts';
-    if (!empty($fromform->contexttofile)) {
+    if (!empty($from_form->contexttofile)) {
         $withcontexts = 'withcontexts';
     }
 
-    $classname = 'qformat_' . $fromform->format;
+    $classname = 'qformat_' . $from_form->format;
     $qformat = new $classname();
     if (count($categoriesids) == 1) {
         $category = $DB->get_record('question_categories', array("id" => $categoriesids[0]), '*', MUST_EXIST);
@@ -86,15 +87,15 @@ if ($fromform = $exportform->get_data()) {
     $filename = question_default_export_filename($COURSE, $category) .
             $qformat->export_file_extension();
     $exporturl = question_make_export_url($thiscontext->id, implode($categoriesids),
-            $fromform->format, $withcategories, $withcontexts, $filename);
+            $from_form->format, $withcategories, $withcontexts, $filename);
 
     echo $OUTPUT->box_start();
-    echo get_string('yourfileshoulddownload', 'question', $export_url->out());
+    echo get_string('yourfileshoulddownload', 'question', $exporturl->out());
     echo $OUTPUT->box_end();
 
     // Don't allow force download for behat site, as pop-up can't be handled by selenium.
     if (!defined('BEHAT_SITE_RUNNING')) {
-        $PAGE->requires->js_function_call('document.location.replace', array($exporturls->out(false)), false, 1);
+        $PAGE->requires->js_function_call('document.location.replace', array($exporturl->out(false)), false, 1);
     }
 
     echo $OUTPUT->continue_button(new moodle_url('edit.php', $thispageurl->params()));
@@ -105,6 +106,6 @@ if ($fromform = $exportform->get_data()) {
 /// Display export form
 echo $OUTPUT->heading_with_help($strexportquestions, 'exportquestions', 'question');
 
-$exportform->display();
+$export_form->display();
 
 echo $OUTPUT->footer();

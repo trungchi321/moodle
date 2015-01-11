@@ -14,10 +14,10 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * JavaScript library for dealing with the question flags.
+ * JavaScript library for exporting several categories.
  *
- * This script, and the YUI libraries that it needs, are inluded by
- * the $PAGE->requires->js calls in question_get_html_head_contributions in lib/questionlib.php.
+ * This script, and the YUI libraries that it needs, are included by
+ * the $PAGE->requires->js calls in file question/export.php.
  *
  * @package    moodlecore
  * @subpackage questionengine
@@ -25,22 +25,6 @@
  * @author Pham Quoc Dai - VSTU
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-function checkChildren(node) {
-
-    var children = node.parentNode.childNodes;
-    var firstInput;
-
-    console.log("parent: " + node.parentNode.parentNode.nodeName);
-
-    for (var i = 0; i < children.length; i++) {
-        if (children[i].tagName == "INPUT") {
-            firstInput = children[i];
-        }
-    }
-
-    checkAll(node.parentNode.parentNode, firstInput.checked);
-}
 
 
 function checkAll(node, checked) {
@@ -53,3 +37,17 @@ function checkAll(node, checked) {
         }
     }
 }
+
+function checkChildren(node) {
+    var children = node.parentNode.childNodes;
+    var firstInput;
+
+    for (var i = 0; i < children.length; i++) {
+        if (children[i].tagName == "INPUT") {
+            firstInput = children[i];
+        }
+    }
+
+    checkAll(node.parentNode.parentNode, firstInput.checked);
+}
+

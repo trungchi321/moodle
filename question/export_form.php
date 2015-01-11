@@ -86,10 +86,10 @@ class question_export_form extends moodleform {
     }
 
     /**
-     * create html block string for array categories
-     * @param array $contexts, categories
-     * @param string $defaultcategory, defaul category
-     * @return string,  format block html of list categories
+     * Create html block string for array categories.
+     * @param array $contexts List categories.
+     * @param string $defaultcategory Default category.
+     * @return string Format block html of list categories.
      */
     public function get_all_block_categories($contexts, $defaultcategory) {
         $blockoutput = '';
@@ -113,10 +113,10 @@ class question_export_form extends moodleform {
     }
 
     /**
-     * create html string for array categories
-     * @param array $categories, categories
-     * @param string $defaultcategory, defaul category
-     * @return string, format html of list categories
+     * Create html string for array categories.
+     * @param array $categories List categories.
+     * @param string $defaultcategory Default category.
+     * @return string Format html of list categories.
      */
     public function block_categories($categories, $defaultcategory) {
         $output = '';
@@ -164,10 +164,10 @@ class question_export_form extends moodleform {
     }
 
     /**
-     * create html string for item category
-     * @param string $content, category
-     * @param boolean $ischecked, checkbox is checked or not
-     * @return string, format html of item category
+     * Create html string for item category.
+     * @param string $content Name of category.
+     * @param boolean $ischecked Checkbox is checked or not.
+     * @return string Format html of item category.
      */
     public function item_html($content, $ischecked) {
         $output = '';
